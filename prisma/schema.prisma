@@ -14,7 +14,61 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Flag {
-	id 	  Int      @id @default(autoincrement())
-	name  String
+enum FeatureFlagType {
+  BOOLEAN
+  PERCENTAGE
+  CONFIG
+}
+
+enum Operator {
+  EQUALS
+  IN
+  NOT_IN
+  GREATER_THAN
+  LESS_THAN
+}
+
+model FeatureFlag {
+  id               String             @id @default(uuid())
+  key              String             @unique
+  description      String?
+  type             FeatureFlagType
+  isEnabled        Boolean?           // tylko dla BOOLEAN
+  rolloutPercentage Int?              // tylko dla PERCENTAGE
+  configJson       Json?              // tylko dla CONFIG
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  targetingRules   TargetingRule[]
+  evaluations      FlagEvaluationLog[]
+  changes          FlagChangeHistory[]
+}
+
+model TargetingRule {
+  id        String     @id @default(uuid())
+  flagId    String
+  attribute String
+  operator  Operator
+  value     Json
+  flag      FeatureFlag @relation(fields: [flagId], references: [id], onDelete: Cascade)
+}
+
+model FlagEvaluationLog {
+  id        String     @id @default(uuid())
+  flagId    String
+  userId    String?
+  requestId String?
+  result    Json
+  createdAt DateTime   @default(now())
+  flag      FeatureFlag @relation(fields: [flagId], references: [id], onDelete: Cascade)
+}
+
+model FlagChangeHistory {
+  id        String     @id @default(uuid())
+  flagId    String
+  changedBy String
+  oldValue  Json
+  newValue  Json
+  createdAt DateTime   @default(now())
+  flag      FeatureFlag @relation(fields: [flagId], references: [id], onDelete: Cascade)
 }
