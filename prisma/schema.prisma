@@ -28,6 +28,11 @@ enum Operator {
   LESS_THAN
 }
 
+enum TargetingType {
+  ATTRIBUTE  // targeting po atrybutach użytkownika
+  GROUP      // targeting po grupach użytkowników
+}
+
 model FeatureFlag {
   id               String             @id @default(uuid())
   key              String             @unique
@@ -45,12 +50,20 @@ model FeatureFlag {
 }
 
 model TargetingRule {
-  id        String     @id @default(uuid())
-  flagId    String
-  attribute String
-  operator  Operator
-  value     Json
-  flag      FeatureFlag @relation(fields: [flagId], references: [id], onDelete: Cascade)
+  id           String        @id @default(uuid())
+  flagId       String
+  targetingType TargetingType
+  
+  // Targeting po atrybutach użytkownika (gdy targetingType = ATTRIBUTE)
+  attribute    String?
+  operator     Operator?
+  value        Json?
+  
+  // Targeting po grupach użytkowników (gdy targetingType = GROUP)
+  groupId      String?
+  
+  flag         FeatureFlag @relation(fields: [flagId], references: [id], onDelete: Cascade)
+  group        UserGroup?  @relation(fields: [groupId], references: [id], onDelete: Cascade)
 }
 
 model FlagEvaluationLog {
@@ -60,7 +73,9 @@ model FlagEvaluationLog {
   requestId String?
   result    Json
   createdAt DateTime   @default(now())
+  
   flag      FeatureFlag @relation(fields: [flagId], references: [id], onDelete: Cascade)
+  user      User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
 }
 
 model FlagChangeHistory {
@@ -71,4 +86,42 @@ model FlagChangeHistory {
   newValue  Json
   createdAt DateTime   @default(now())
   flag      FeatureFlag @relation(fields: [flagId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id          String    @id @default(uuid())
+  externalId  String?   @unique // ID z zewnętrznego systemu auth
+  email       String?   @unique
+  name        String?
+  attributes  Json?     // dodatkowe atrybuty użytkownika (country, plan, etc.)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  groupMemberships UserGroupMembership[]
+  evaluations      FlagEvaluationLog[]
+}
+
+model UserGroup {
+  id          String    @id @default(uuid())
+  key         String    @unique // np. "testers", "premium_users", "beta_users"
+  name        String    // np. "Testerzy", "Użytkownicy Premium"
+  description String?
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  memberships   UserGroupMembership[]
+  targetingRules TargetingRule[]
+}
+
+model UserGroupMembership {
+  id        String    @id @default(uuid())
+  userId    String
+  groupId   String
+  createdAt DateTime  @default(now())
+
+  user  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group UserGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, groupId]) // użytkownik może być w grupie tylko raz
 }
