@@ -16,7 +16,36 @@ server.register(registerRoutes);
 server.get('/', async (request: FastifyRequest, reply: FastifyReply): Promise<RootResponse> => {
 	return {
 		message: 'Fastify TypeScript server is running!',
-		endpoints: ['GET /'],
+		endpoints: [
+			'GET /',
+			// Flag endpoints
+			'POST /flags',
+			'GET /flags',
+			'PUT /flags/:id',
+			'PATCH /flags/:id/toggle',
+			'POST /flags/:id/rules',
+			'DELETE /flags/:id/rules',
+			'POST /evaluate',
+			// User endpoints (public)
+			'POST /users',
+			'POST /users/login',
+			// User endpoints (protected)
+			'POST /users/logout [AUTH]',
+			'DELETE /users/:id [AUTH]',
+			'GET /users [AUTH]',
+			'GET /users/:id [AUTH]',
+			'GET /users/me [AUTH]',
+			// Group endpoints (all protected)
+			'POST /groups [AUTH]',
+			'GET /groups [AUTH]',
+			'GET /groups/:groupId [AUTH]',
+			'PUT /groups/:groupId [AUTH]',
+			'DELETE /groups/:groupId [AUTH]',
+			'POST /groups/:groupId/users [AUTH]',
+			'DELETE /groups/:groupId/users/:userId [AUTH]',
+			'GET /groups/:groupId/members [AUTH]',
+			'GET /users/:userId/groups [AUTH]',
+		],
 	};
 });
 
