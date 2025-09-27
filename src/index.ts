@@ -1,32 +1,13 @@
 import fastify, { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import { RootResponse } from './types';
 
 // Create Fastify instance
 const server: FastifyInstance = fastify({ logger: true });
 
-// Define interface for test response
-interface TestResponse {
-	message: string;
-	timestamp: string;
-	status: string;
-}
-
-interface RootResponse {
-	message: string;
-	endpoints: string[];
-}
-
-server.get('/test', async (request: FastifyRequest, reply: FastifyReply): Promise<TestResponse> => {
-	return {
-		message: 'Hello from Fastify with TypeScript!',
-		timestamp: new Date().toISOString(),
-		status: 'success',
-	};
-});
-
 server.get('/', async (request: FastifyRequest, reply: FastifyReply): Promise<RootResponse> => {
 	return {
 		message: 'Fastify TypeScript server is running!',
-		endpoints: ['GET /', 'GET /test'],
+		endpoints: ['GET /'],
 	};
 });
 
