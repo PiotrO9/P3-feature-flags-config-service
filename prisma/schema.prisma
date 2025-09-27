@@ -92,6 +92,7 @@ model User {
   id          String    @id @default(uuid())
   externalId  String?   @unique // ID z zewnętrznego systemu auth
   email       String?   @unique
+  password    String    // hasło użytkownika
   name        String?
   attributes  Json?     // dodatkowe atrybuty użytkownika (country, plan, etc.)
   createdAt   DateTime  @default(now())
