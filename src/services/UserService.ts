@@ -1,4 +1,4 @@
-import { prisma } from '../config/database';
+import { getPrisma } from '../config/database';
 import * as bcrypt from 'bcrypt';
 import { CreateUserRequest, UserResponse } from '../types';
 
@@ -6,8 +6,7 @@ export class UserService {
 	private readonly saltRounds = 10;
 
 	async createUser(data: CreateUserRequest): Promise<UserResponse> {
-		// Sprawdź czy użytkownik już istnieje
-		const existingUser = await prisma.user.findUnique({
+		const existingUser = await getPrisma().user.findUnique({
 			where: { email: data.email },
 		});
 
@@ -15,11 +14,9 @@ export class UserService {
 			throw new Error('User with this email already exists');
 		}
 
-		// Haszuj hasło
 		const hashedPassword = await bcrypt.hash(data.password, this.saltRounds);
 
-		// Utwórz użytkownika
-		const user = await prisma.user.create({
+		const user = await getPrisma().user.create({
 			data: {
 				email: data.email,
 				password: hashedPassword,
@@ -32,7 +29,7 @@ export class UserService {
 	}
 
 	async getUserById(id: string): Promise<UserResponse | null> {
-		const user = await prisma.user.findUnique({
+		const user = await getPrisma().user.findUnique({
 			where: { id },
 		});
 
@@ -40,7 +37,7 @@ export class UserService {
 	}
 
 	async getUserByEmail(email: string): Promise<UserResponse | null> {
-		const user = await prisma.user.findUnique({
+		const user = await getPrisma().user.findUnique({
 			where: { email },
 		});
 
@@ -48,7 +45,7 @@ export class UserService {
 	}
 
 	async getAllUsers(): Promise<UserResponse[]> {
-		const users = await prisma.user.findMany({
+		const users = await getPrisma().user.findMany({
 			orderBy: { createdAt: 'desc' },
 		});
 
@@ -57,7 +54,7 @@ export class UserService {
 
 	async deleteUser(id: string): Promise<boolean> {
 		try {
-			await prisma.user.delete({
+			await getPrisma().user.delete({
 				where: { id },
 			});
 			return true;
@@ -67,7 +64,7 @@ export class UserService {
 	}
 
 	async verifyPassword(email: string, password: string): Promise<UserResponse | null> {
-		const user = await prisma.user.findUnique({
+		const user = await getPrisma().user.findUnique({
 			where: { email },
 		});
 

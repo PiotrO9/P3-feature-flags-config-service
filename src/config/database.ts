@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../generated/prisma';
 
 export class DatabaseConfig {
 	private static instance: PrismaClient;
@@ -17,4 +17,5 @@ export class DatabaseConfig {
 	}
 }
 
-export const prisma = DatabaseConfig.getInstance();
+// Lazy initialization - only create the instance when needed, not when module is imported
+export const getPrisma = () => DatabaseConfig.getInstance();

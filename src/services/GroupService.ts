@@ -1,3 +1,3 @@
-import { prisma } from '../config/database';
+import { getPrisma } from '../config/database';
 
 export class GroupService {}

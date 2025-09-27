@@ -27,7 +27,7 @@ services:
   container_name: flag_feature_app
   ports:
    - '3000:3000'
-  environment: # było literówka: enviornment
+  environment:
    NODE_ENV: ${NODE_ENV:-development}
    PORT: ${PORT:-3000}
    DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@postgres:5432/${POSTGRES_DB:-flag_feature}?schema=public
@@ -39,8 +39,8 @@ services:
    - feature_flag_network
   volumes:
    - .:/app
-   - /app/node_modules # było literówka: noded_modules
-  command: sh -c "npm install && npx prisma migrate deploy && npm run dev"
+   - /app/node_modules
+  command: sh -c "npm install && npx prisma generate && npx prisma migrate deploy && npm run dev"
   healthcheck:
    test: ['CMD', 'wget', '--no-verbose', '--tries=1', '--spider', 'http://localhost:3000/health']
    interval: 30s
