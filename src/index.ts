@@ -5,6 +5,13 @@ import { registerRoutes } from './routes';
 // Create Fastify instance
 const server: FastifyInstance = fastify({ logger: true });
 
+// Register CORS plugin
+server.register(require('@fastify/cors'), {
+	origin: ['http://localhost:3001', 'http://127.0.0.1:3001'], // Allow frontend origins
+	credentials: true, // Allow cookies and auth headers
+	methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+});
+
 // Register JWT plugin
 server.register(require('@fastify/jwt'), {
 	secret: process.env.JWT_SECRET || 'your-secret-key-change-this-in-production',
