@@ -77,7 +77,7 @@ export class FlagController {
 		try {
 			const { id } = request.params as IdParams;
 			const flagData = request.body as Partial<FeatureFlagRequest>;
-			const updatedBy = 'system'; // TODO: Get from auth middleware
+			const updatedBy = 'system';
 
 			// Validate ID
 			const idErrors = FlagValidator.validateId(id, 'Flag ID');
@@ -100,7 +100,7 @@ export class FlagController {
 	async toggleFlag(request: FastifyRequest, reply: FastifyReply): Promise<void> {
 		try {
 			const { id } = request.params as IdParams;
-			const updatedBy = 'system'; // TODO: Get from auth middleware
+			const updatedBy = 'system';
 
 			const idErrors = FlagValidator.validateId(id, 'Flag ID');
 			if (idErrors.length > 0) {
